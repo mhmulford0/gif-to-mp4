@@ -52,4 +52,4 @@ function processImage(gifPath, idx) {
 //   });
 //   return p;
 // }
-processImage(gifs[0], 1)
+processImage("mid.gif", 1)
