@@ -32,6 +32,9 @@ function processImage(gifPath, idx) {
   });
 }
 
+
+
+
 const imgs = ["./mid.gif", "./mid.gif", "./mid.gif", "./mid.gif", "./mid.gif"];
 
 async function main() {
