@@ -42,7 +42,7 @@ async function main() {
     });
   });
 
-  queue.process(4, async (job, done) => {
+  queue.process(2, async (job, done) => {
     console.log(`Processing job ${job.id}`);
     await processImage("./mid.gif");
     try {
