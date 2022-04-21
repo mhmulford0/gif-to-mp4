@@ -6,7 +6,7 @@ const ffmpeg = require("fluent-ffmpeg")()
   .setFfmpegPath(ffmpegInstaller.path);
 
 function processImage(gifPath, idx) {
-  new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     ffmpeg
       .input(gifPath)
       .outputOptions([
@@ -24,17 +24,24 @@ function processImage(gifPath, idx) {
       .on("start", () => {
         console.log(`Processing Image #${idx}`);
       })
-      .on("error", (e) => console.log(e))
+      .on("error", (e) => {
+        reject();
+        console.log(e);
+      })
       .run();
   });
 }
 
 const imgs = ["./mid.gif", "./mid.gif", "./mid.gif", "./mid.gif", "./mid.gif"];
 
-function main() {
+async function main() {
   for (let i = 0; i < 3; i++) {
-    processImage(imgs[0], i);
+    try {
+      await processImage(imgs[0], i);
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
 
-main()
+main();
