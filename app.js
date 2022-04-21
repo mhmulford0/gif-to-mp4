@@ -19,7 +19,7 @@ function processImage(gifPath, idx) {
       .output(`vidgif${idx}.mp4`)
       .on("end", () => {
         console.log("Ended");
-        resolve()
+        resolve();
       })
       .on("start", () => {
         console.log(`Processing Image #${idx}`);
@@ -29,4 +29,12 @@ function processImage(gifPath, idx) {
   });
 }
 
-processImage("mid.gif", 1)
+const imgs = ["./mid.gif", "./mid.gif", "./mid.gif", "./mid.gif", "./mid.gif"];
+
+function main() {
+  for (let i = 0; i < 5; i++) {
+    processImage(imgs[0], i);
+  }
+}
+
+main()
