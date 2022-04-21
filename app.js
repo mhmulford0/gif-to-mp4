@@ -5,7 +5,17 @@ const ffmpeg = require("fluent-ffmpeg")()
   .setFfprobePath(ffprobe.path)
   .setFfmpegPath(ffmpegInstaller.path);
 
+const Queue = require("bee-queue");
+const queue = new Queue("convert-gif");
+
+const d = new Date();
+
 function processImage(gifPath, idx) {
+  const job = queue.createJob({ gifPath: "./mid.gif", id: d.getSeconds() });
+  job.save();
+  job.on("succeeded", (result) => {
+    console.log(`Completed Job:  ${job.id}`);
+  });
   return new Promise((resolve, reject) => {
     ffmpeg
       .input(gifPath)
@@ -18,33 +28,27 @@ function processImage(gifPath, idx) {
       .noAudio()
       .output(`vidgif${idx}.mp4`)
       .on("end", () => {
-        console.log("Ended");
         resolve();
       })
-      .on("start", () => {
-        console.log(`Processing Image #${idx}`);
-      })
       .on("error", (e) => {
-        reject();
-        console.log(e);
+        return reject(new Error(e));
       })
       .run();
   });
 }
 
-
-
-
-const imgs = ["./mid.gif", "./mid.gif", "./mid.gif", "./mid.gif", "./mid.gif"];
-
 async function main() {
-  for (let i = 0; i < 3; i++) {
+  await processImage("./mid.gif", d.getSeconds());
+  await processImage("./mid.gif", d.getSeconds() + 10);
+
+  queue.process(2, async (job, done) => {
+    console.log(`Processing job ${job.id}`);
     try {
-      await processImage(imgs[0], i);
     } catch (error) {
       console.log(error);
     }
-  }
+    return done(null);
+  });
 }
 
 main();
