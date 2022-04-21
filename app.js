@@ -1,3 +1,4 @@
+const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 
 const ffmpegInstaller = require("@ffmpeg-installer/ffmpeg");
@@ -6,9 +7,12 @@ const ffprobe = require("@ffprobe-installer/ffprobe");
 const Queue = require("bee-queue");
 const queue = new Queue("convert-gif");
 
-const d = new Date();
-
 function processImage(gifPath) {
+  const stats = fs.statSync(gifPath);
+
+  if (stats.size > 27214400) {
+    throw new Error("File too Large, must be under 25mb");
+  }
   const ffmpeg = require("fluent-ffmpeg")()
     .setFfprobePath(ffprobe.path)
     .setFfmpegPath(ffmpegInstaller.path);
@@ -40,10 +44,13 @@ async function main() {
     job.on("succeeded", (result) => {
       console.log(`Completed Job:  ${job.id}`);
     });
+    job.on("failed", (err) => {
+      console.log(`Job failed: ${err}`);
+    });
   });
 
-  queue.process(2, async (job, done) => {
-    console.log(`Processing job ${job.id}`);
+  queue.process(4, async (job, done) => {
+    console.log(`Processing Job: ${job.id}`);
     await processImage("./mid.gif");
     try {
     } catch (error) {
