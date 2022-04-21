@@ -32,7 +32,7 @@ function processImage(gifPath, idx) {
 const imgs = ["./mid.gif", "./mid.gif", "./mid.gif", "./mid.gif", "./mid.gif"];
 
 function main() {
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 3; i++) {
     processImage(imgs[0], i);
   }
 }
