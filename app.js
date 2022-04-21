@@ -6,6 +6,7 @@ const ffprobe = require("@ffprobe-installer/ffprobe");
 
 const Queue = require("bee-queue");
 const queue = new Queue("convert-gif");
+const express = require("express");
 
 function processImage(gifPath) {
   const stats = fs.statSync(gifPath);
@@ -38,7 +39,7 @@ function processImage(gifPath) {
 }
 
 async function main() {
-  [...Array(10)].map(() => {
+  [...Array(100)].map(() => {
     const job = queue.createJob({ id: uuidv4() });
     job.save();
     job.on("succeeded", (result) => {
@@ -58,6 +59,6 @@ async function main() {
     }
     return done(null);
   });
-}
 
+}
 main();
