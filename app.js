@@ -14,6 +14,12 @@ function processImage(gifPath) {
   if (stats.size > 27214400) {
     throw new Error("File too Large, must be under 25mb");
   }
+
+  queue.getJobs("waiting", { start: 0, end: 25 }).then((jobs) => {
+    const jobIds = jobs.map((job) => job.id);
+    console.log("Jobs Remaining: " + jobIds.length);
+  });
+
   const ffmpeg = require("fluent-ffmpeg")()
     .setFfprobePath(ffprobe.path)
     .setFfmpegPath(ffmpegInstaller.path);
@@ -39,7 +45,14 @@ function processImage(gifPath) {
 }
 
 async function main() {
-  [...Array(100)].map(() => {
+  let fileLocations = [];
+  fileLocations = [...Array(10)];
+
+  if (fileLocations.length < 1) {
+    throw new Error("No Files provided")
+  };
+
+  fileLocations.map(() => {
     const job = queue.createJob({ id: uuidv4() });
     job.save();
     job.on("succeeded", (result) => {
@@ -50,7 +63,7 @@ async function main() {
     });
   });
 
-  queue.process(2, async (job, done) => {
+  queue.process(3, async (job, done) => {
     console.log(`Processing Job: ${job.id}`);
     await processImage("./mid.gif");
     try {
@@ -59,6 +72,5 @@ async function main() {
     }
     return done(null);
   });
-
 }
 main();
