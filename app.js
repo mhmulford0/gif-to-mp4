@@ -15,9 +15,9 @@ function processImage(gifPath) {
     throw new Error("File too Large, must be under 25mb");
   }
 
-  queue.getJobs("waiting", { start: 0, end: 25 }).then((jobs) => {
+  queue.getJobs("waiting").then((jobs) => {
     const jobIds = jobs.map((job) => job.id);
-    console.log("Jobs Remaining: " + jobIds.length);
+    console.log("Jobs In queue: " + jobIds.length);
   });
 
   const ffmpeg = require("fluent-ffmpeg")()
@@ -33,7 +33,7 @@ function processImage(gifPath) {
         "-filter:v crop='floor(in_w/2)*2:floor(in_h/2)*2'",
       ])
       .noAudio()
-      .output(`vidgif${uuidv4()}.mp4`)
+      .output(`${uuidv4()}.mp4`)
       .on("end", () => {
         resolve();
       })
@@ -63,7 +63,7 @@ async function main() {
     });
   });
 
-  queue.process(3, async (job, done) => {
+  queue.process(2, async (job, done) => {
     console.log(`Processing Job: ${job.id}`);
     await processImage("./mid.gif");
     try {
