@@ -8,7 +8,6 @@ const Queue = require("bee-queue");
 const queue = new Queue("convert-gif");
 const express = require("express");
 
-
 function processImage(gifPath) {
   const stats = fs.statSync(gifPath);
 
@@ -45,20 +44,20 @@ function processImage(gifPath) {
   });
 }
 
-async function main() {
+async function main(fileName = "") {
   let fileLocations = [];
   fileLocations = [...Array(25)];
 
   if (fileLocations.length < 1) {
-    throw new Error("No Files provided")
-  };
+    throw new Error("No Files provided");
+  }
 
   fileLocations.map(() => {
     const job = queue.createJob({ id: uuidv4() });
     job.save();
     job.on("succeeded", async (result) => {
       const counts = await queue.checkHealth();
-      console.log('job state counts:', counts);
+      console.log("job state counts:", counts);
     });
     job.on("failed", (err) => {
       console.log(`Job failed: ${err}`);
@@ -67,7 +66,7 @@ async function main() {
 
   queue.process(2, async (job, done) => {
     console.log(`Processing Job: ${job.id}`);
-    await processImage("./big.gif");
+    await processImage(`./${fileName.toString()}.gif`);
     try {
     } catch (error) {
       console.log(error);
@@ -75,4 +74,4 @@ async function main() {
     return done(null);
   });
 }
-main();
+main("mid")
