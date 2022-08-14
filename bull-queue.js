@@ -10,10 +10,10 @@ const ffprobe = require("@ffprobe-installer/ffprobe");
 
 const videoQueue = new Queue(
   "video transcoding",
-  "redis://default:QUuFnSn9AwyU88tjfyF9@containers-us-west-73.railway.app:5878"
+  "redis://localhost:6379"
 );
 
-videoQueue.process(4, (job) => {
+videoQueue.process((job) => {
   console.log(job.data);
   const ffmpeg = require("fluent-ffmpeg")()
     .setFfprobePath(ffprobe.path)
@@ -40,9 +40,9 @@ videoQueue.process(4, (job) => {
 });
 
 async function main() {
-  const numberOfRuns = [...Array(10)];
+  const numberOfRuns = [...Array(3)];
 
-  numberOfRuns.map(() => videoQueue.add({ video: "./big.gif" }));
+  numberOfRuns.map(() => videoQueue.add({ video: "./hi-res.gif" }));
 }
 
 main()
