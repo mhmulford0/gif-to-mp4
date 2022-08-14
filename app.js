@@ -1,32 +1,22 @@
-const fs = require("fs");
+const Queue = require("bull");
+
 const { v4: uuidv4 } = require("uuid");
 
 const ffmpegInstaller = require("@ffmpeg-installer/ffmpeg");
 const ffprobe = require("@ffprobe-installer/ffprobe");
 
-const Queue = require("bee-queue");
-const queue = new Queue("convert-gif");
-const express = require("express");
+// redis://default:QUuFnSn9AwyU88tjfyF9@containers-us-west-73.railway.app:5878
+//
 
+const videoQueue = new Queue("video transcoding", "redis://localhost:6379");
 
-function processImage(gifPath) {
-  const stats = fs.statSync(gifPath);
-
-  // if (stats.size > 27214400) {
-  //   throw new Error("File too Large, must be under 25mb");
-  // }
-
-  queue.getJobs("waiting").then((jobs) => {
-    const jobIds = jobs.map((job) => job.id);
-    console.log("Jobs In queue: " + jobIds.length);
-  });
-
+videoQueue.process((job) => {
   const ffmpeg = require("fluent-ffmpeg")()
     .setFfprobePath(ffprobe.path)
     .setFfmpegPath(ffmpegInstaller.path);
   return new Promise((resolve, reject) => {
     ffmpeg
-      .input(gifPath)
+      .input(job.data.video)
       .outputOptions([
         "-pix_fmt yuv420p",
         "-c:v libx264",
@@ -43,36 +33,21 @@ function processImage(gifPath) {
       })
       .run();
   });
-}
+});
+
+videoQueue.on("completed", function (job) {
+  console.log("--- Job ---")
+  console.log("Job ID: " + job.id);
+  console.table(job.data);
+  console.log("Completed At: " + job.finishedOn);
+});
 
 async function main() {
-  let fileLocations = [];
-  fileLocations = [...Array(25)];
+  const numberOfRuns = [...Array(25)];
 
-  if (fileLocations.length < 1) {
-    throw new Error("No Files provided")
-  };
-
-  fileLocations.map(() => {
-    const job = queue.createJob({ id: uuidv4() });
-    job.save();
-    job.on("succeeded", async (result) => {
-      const counts = await queue.checkHealth();
-      console.log('job state counts:', counts);
-    });
-    job.on("failed", (err) => {
-      console.log(`Job failed: ${err}`);
-    });
-  });
-
-  queue.process(2, async (job, done) => {
-    console.log(`Processing Job: ${job.id}`);
-    await processImage("./big.gif");
-    try {
-    } catch (error) {
-      console.log(error);
-    }
-    return done(null);
-  });
+  numberOfRuns.map(() => videoQueue.add({ video: "./hi-res.gif" }));
 }
-main();
+
+main()
+  .then()
+  .catch(() => process.exit(1));
