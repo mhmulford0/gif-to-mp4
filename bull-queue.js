@@ -13,8 +13,8 @@ const videoQueue = new Queue(
   "redis://default:QUuFnSn9AwyU88tjfyF9@containers-us-west-73.railway.app:5878"
 );
 
-videoQueue.process(2, (job, done) => {
-  console.log(job.data.video);
+videoQueue.process(4, (job) => {
+  console.log(job.data);
   const ffmpeg = require("fluent-ffmpeg")()
     .setFfprobePath(ffprobe.path)
     .setFfmpegPath(ffmpegInstaller.path);
