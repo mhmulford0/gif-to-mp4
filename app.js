@@ -33,18 +33,19 @@ videoQueue.process((job) => {
 });
 
 videoQueue.on("completed", function (job) {
-  console.log("--- Job ---")
+  console.log("--- Job ---");
   console.log("Job ID: " + job.id);
   console.table(job.data);
   console.log("Completed At: " + job.finishedOn);
 });
 
 async function main() {
-  const numberOfRuns = [...Array(25)];
-
-  numberOfRuns.map(() => videoQueue.add({ video: "./hi-res.gif" }));
+  const numberOfRuns = [...Array(5)];
+  numberOfRuns.map(() => videoQueue.add({ video: "./big.gif" }));
 }
 
 main()
   .then()
-  .catch(() => process.exit(1));
+  .catch(() => {
+    console.log(e)
+  });
