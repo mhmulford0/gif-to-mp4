@@ -44,13 +44,5 @@ videoQueue.on("error", function (job) {
   console.log("Job ID: " + job.message);
 });
 
-async function main() {
-  const numberOfRuns = [...Array(3)];
-  numberOfRuns.map(() => videoQueue.add({ video: "./mid.gif" }));
-}
 
-main()
-  .then()
-  .catch(() => {
-    console.log(e)
-  });
+module.exports = videoQueue;
