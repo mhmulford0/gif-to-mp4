@@ -34,14 +34,19 @@ videoQueue.process((job) => {
 
 videoQueue.on("completed", function (job) {
   console.log("--- Job ---");
-  console.log("Job ID: " + job.id);
+  console.log("ID: " + job.id);
   console.table(job.data);
   console.log("Completed At: " + job.finishedOn);
 });
 
+videoQueue.on("error", function (job) {
+  console.log("--- Job ---");
+  console.log("Job ID: " + job.message);
+});
+
 async function main() {
-  const numberOfRuns = [...Array(5)];
-  numberOfRuns.map(() => videoQueue.add({ video: "./big.gif" }));
+  const numberOfRuns = [...Array(3)];
+  numberOfRuns.map(() => videoQueue.add({ video: "./mid.gif" }));
 }
 
 main()
