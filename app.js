@@ -21,7 +21,7 @@ videoQueue.process((job) => {
         "-filter:v crop='floor(in_w/2)*2:floor(in_h/2)*2'",
       ])
       .noAudio()
-      .output(`${uuidv4()}.mp4`)
+      .output(`./tmp/${uuidv4()}.mp4`)
       .on("end", () => {
         resolve();
       })
@@ -36,7 +36,9 @@ videoQueue.on("completed", function (job) {
   console.log("--- Job ---");
   console.log("ID: " + job.id);
   console.table(job.data);
+  console.log(job.data.video);
   console.log("Completed At: " + job.finishedOn);
+  fs.unlinkSync(job.data.video);
 });
 
 videoQueue.on("error", function (job) {
