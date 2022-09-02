@@ -22,7 +22,8 @@ f.post("/upload", async (request, reply) => {
     encoding: "base64",
   });
 
-  const buff = Buffer.from(bitmap, "base64");
+  const buff = Buffer.from(gifData, "base64");
+
 
   const fileId = crypto.randomUUID();
   fs.writeFileSync(path.resolve(__dirname, `./tmp/${fileId}.gif`), buff);
